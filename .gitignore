@@ -150,3 +150,7 @@ fabric.properties
 
 # DynamoDB Local files
 .dynamodb/
+
+
+serviceAccountKey.json
+nodemon.json
