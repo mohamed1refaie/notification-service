@@ -12,3 +12,8 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - "27017:27017"
