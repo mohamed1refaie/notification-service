@@ -37,7 +37,7 @@ exports.subscribe_to_topic = (req, res, next) => {
     const topic = req.params.topic;
     const Ids = req.body.ids;
     if (Ids === undefined || Ids === "") {
-        res.status(401).json({error: "ids field cannot be empty"});
+        res.status(400).json({error: "ids field is required"});
     }
     User.find({'userId': Ids}).select('token -_id').then(users => {
         let tokens = users.map((user) => {

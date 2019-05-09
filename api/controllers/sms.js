@@ -29,7 +29,7 @@ exports.send_sms_to_all = (req, res, next) => {
 
     const msg = req.body.message;
     if (msg === undefined || msg === "") {
-        res.status(400).json({error: "message can't be empty"})
+        res.status(400).json({error: "message is required"})
     } else {
         User.find().exec().then(users => {
 
@@ -94,8 +94,8 @@ exports.send_sms_to_specific = (req, res, next) => {
     const msg = req.body.message;
     const Ids = req.body.ids;
 
-    if (msg === undefined || msg === "") {
-        res.status(400).json({error: "message cannot be empty"});
+    if (msg === undefined || msg === "" || Ids === undefined) {
+        res.status(400).json({error: "message and ids are required"});
     } else {
         User.find({'userId': Ids}).select('phoneNumber -_id').then(users => {
             let phoneNumbers = users.map((user) => {

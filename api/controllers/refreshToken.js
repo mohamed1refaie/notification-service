@@ -9,7 +9,7 @@ const User = require('../models/user');
 exports.refresh_user_token = (req, res, next) => {
 
     if (req.body.id === undefined || req.body.token === undefined || req.body.id === "" || req.body.token === "") {
-        res.status(400).json({error: "id and token can't be empty"});
+        res.status(400).json({error: "id and token are required"});
     } else {
         const id = req.body.id;
         const newToken = req.body.token;

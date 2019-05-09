@@ -39,62 +39,64 @@ let send_notification = (tokens, payload) => {
  */
 exports.send_notification_to_all = (req, res, next) => {
 
-    const msg = req.body.message;
     const title = req.body.title;
+    const msg = req.body.message;
     const data = req.body.data;
+    if (msg === undefined || msg === "" || title === undefined || title === "" || data === undefined) {
+        res.status(400).json({error: "title, message, and data are required"});
+    } else {
+        let payload = {
+            notification: {
+                title: title,
+                body: msg
+            },
+            data: data
+        };
 
-    let payload = {
-        notification: {
-            title: title,
-            body: msg
-        },
-        data: data
-    };
+        User.find().exec().then(users => {
 
-    User.find().exec().then(users => {
+            let tokens = users.map((user) => {
+                return user.token;
+            });
 
-        let tokens = users.map((user) => {
-            return user.token;
-        });
+            if (tokens.length > 0) {
+                let returnJson = [];
+                let statusCode = 200;
+                let noOfLoads = tokens.length / 1000;
+                if (tokens.length % 1000 !== 0) {
+                    noOfLoads++;
+                }
+                noOfLoads = Math.floor(noOfLoads);
 
-        if (tokens.length > 0) {
-            let returnJson = [];
-            let statusCode = 200;
-            let noOfLoads = tokens.length / 1000;
-            if (tokens.length % 1000 !== 0) {
-                noOfLoads++;
+                for (let i = 0; i < noOfLoads; i++) {
+                    let start = i * 1000, end = (i + 1) * 1000;
+                    let batchTokens = tokens.slice(start, end);
+                    send_notification(batchTokens, payload).then(jsonObj => {
+                        returnJson.push({loadNumber: i + 1, success: jsonObj});
+                        if (i + 1 === noOfLoads) {
+                            res.status(statusCode).json(returnJson);
+                        }
+                    }).catch(error => {
+                        returnJson.push({loadNumber: i + 1, error: error});
+                        statusCode = 500;
+
+                        if (i + 1 === noOfLoads) {
+                            res.status(statusCode).json(returnJson);
+                        }
+                    });
+                }
+            } else {
+                res.status(200).json({message: "no tokens to send to"})
             }
-            noOfLoads = Math.floor(noOfLoads);
-
-            for (let i = 0; i < noOfLoads; i++) {
-                let start = i * 1000, end = (i + 1) * 1000;
-                let batchTokens = tokens.slice(start, end);
-                send_notification(batchTokens, payload).then(jsonObj => {
-                    returnJson.push({loadNumber: i + 1, success: jsonObj});
-                    if (i + 1 === noOfLoads) {
-                        res.status(statusCode).json(returnJson);
-                    }
-                }).catch(error => {
-                    returnJson.push({loadNumber: i + 1, error: error});
-                    statusCode = 500;
-
-                    if (i + 1 === noOfLoads) {
-                        res.status(statusCode).json(returnJson);
-                    }
-                });
-            }
-        } else {
-            res.status(200).json({message: "no tokens to send to"})
-        }
 
 
-    }).catch(err => {
-        console.log(err);
-        res.status(500).json({
-            error: err,
+        }).catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err,
+            });
         });
-    });
-
+    }
 };
 
 /*
@@ -105,39 +107,43 @@ exports.send_notification_to_all = (req, res, next) => {
  */
 exports.send_notification_to_specific = (req, res, next) => {
     const Ids = req.body.ids;
-    const msg = req.body.message;
     const title = req.body.title;
+    const msg = req.body.message;
     const data = req.body.data;
 
-    let payload = {
-        notification: {
-            title: title,
-            body: msg
-        },
-        data: data
-    };
+    if (Ids === undefined || msg === undefined || title === undefined || data === undefined || msg === "" || title === "") {
+        res.status(400).json({error: "ids, title, message, and data are required"});
+    } else {
+        let payload = {
+            notification: {
+                title: title,
+                body: msg
+            },
+            data: data
+        };
 
-    User.find({'userId': Ids}).select('token -_id').then(users => {
-        let tokens = users.map((user) => {
-            return user.token;
+        User.find({'userId': Ids}).select('token -_id').then(users => {
+            let tokens = users.map((user) => {
+                return user.token;
+            });
+
+            if (tokens.length > 0) {
+                send_notification(tokens, payload).then(jsonObj => {
+                    res.status(200).json(jsonObj);
+                }).catch(error => {
+                    res.status(500).json(error);
+                })
+            } else {
+                res.status(200).json({message: "No valid ids"});
+            }
+
+        }).catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err,
+            });
         });
-
-        if (tokens.length > 0) {
-            send_notification(tokens, payload).then(jsonObj => {
-                res.status(200).json(jsonObj);
-            }).catch(error => {
-                res.status(500).json(error);
-            })
-        } else {
-            res.status(200).json({message: "No valid ids"});
-        }
-
-    }).catch(err => {
-        console.log(err);
-        res.status(500).json({
-            error: err,
-        });
-    });
+    }
 
 };
 
@@ -151,12 +157,12 @@ exports.send_notification_to_specific = (req, res, next) => {
  */
 exports.send_notification_to_group = (req, res, next) => {
     const topic = req.body.topic;
-    const msg = req.body.message;
     const title = req.body.title;
+    const msg = req.body.message;
     const data = req.body.data;
 
-    if (topic === undefined || topic === "") {
-        res.status(400).json({error: "topic can't be empty"});
+    if (topic === undefined || topic === "" || msg === undefined || title === undefined || data === undefined || msg === "" || title === "") {
+        res.status(400).json({error: "topic, title, message, and data are required"});
     } else {
 
         let payload = {
