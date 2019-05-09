@@ -26,17 +26,17 @@ To Run the Project:
 * run `sudo docker-compose up` it will be listening at localhost:3000
 
 The API contains 8 endpoints 
-  1- /subscribe
-      -/
-      -/:topic
-  2- /notifications
-      -/
-      -/notifications/toAll
-      -/notifications/toGroup
-  3- /sms
-    -/
-    -/toAll
-  4- /refreshToken
+  1. /subscribe
+     * /
+     * /:topic
+  2. /notifications
+     * /
+     * /notifications/toAll
+     * /notifications/toGroup
+  3. /sms
+     * /
+     * /toAll
+  4. /refreshToken
   
-You can see a full documentation for the api and examples from [here](https://documenter.getpostman.com/view/3845720/S1Lwy7kT)
+**You can see a full documentation for the api and examples from [here](https://documenter.getpostman.com/view/3845720/S1Lwy7kT)**
 
