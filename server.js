@@ -4,4 +4,6 @@ const port = process.env.port || 3000;
 
 const server = http.createServer(app);
 
-server.listen(port, "0.0.0.0");
+server.listen(port, function () {
+    console.log(`Running on ${port}`);
+});
