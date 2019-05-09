@@ -2,7 +2,7 @@
 
 This is a Notification server build with [nodejs](https://nodejs.org/en/), it uses [express](https://expressjs.com/), [mongoose](https://mongoosejs.com/) and [firebase-admin sdk](https://firebase.google.com/docs/admin/setup) to send notifications. The Server let you 
 1. subscribe a user to the notifications and subscribe a user to a certain topic. 
-2. send notification to all the subscribed users, a specific user or users, to a group of users with a common topic. 
+2. send notification to all the subscribed users, to a specific user or users, to a group of users with a common topic. 
 3. send sms to all the subscribed users and to a specific user or users. 
 4. refresh a certain user's firebase token.
 
